@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Centros de Acopio Madrid
 
-## Getting Started
+Plataforma abierta para coordinar puntos de recogida de ayuda
+humanitaria en Madrid destinada a Venezuela tras los terremotos del
+24 de junio de 2026.
 
-First, run the development server:
+Cada centro publica qué necesita y qué le sobra para que las
+donaciones lleguen donde más hacen falta, en lugar de fragmentarse.
+
+> **Estado:** desarrollo activo (MVP). El esquema de BD y la API
+> pueden cambiar sin aviso hasta la versión 1.0.
+
+## Stack
+
+- **Next.js 15** (App Router, Server Components, Server Actions)
+- **Supabase** (PostgreSQL + PostGIS + Auth + Row Level Security)
+- **MapLibre GL** + tiles de OpenFreeMap
+- **TypeScript**, Tailwind CSS, shadcn/ui
+
+## Puesta en marcha local
+
+Requisitos: Node 20+, una cuenta de Supabase (free tier sirve).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/<tu-usuario>/centros-acopio.git
+cd centros-acopio
+npm install
+cp .env.local.example .env.local
+# Rellena .env.local con tus claves de Supabase
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplica el esquema en el SQL Editor de Supabase en este orden:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. `supabase/migrations/01_schema.sql`
+2. `supabase/migrations/02_grants.sql`
+3. `supabase/migrations/03_slug.sql`
+4. `supabase/migrations/04_centers_rpc.sql`
+5. (opcional) `supabase/seed/test_centers.sql` para datos de prueba
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Genera los tipos TypeScript desde tu proyecto:
 
-## Learn More
+```bash
+npm run types:gen
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Abre [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## API pública
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+El proyecto expone endpoints de solo lectura sin autenticación para
+que otras webs, asistentes, bots o agentes humanitarios consuman los
+datos. Documentación completa en [`docs/API.md`](docs/API.md).
 
-## Deploy on Vercel
+Rápido:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+curl https://<tu-dominio>/api/v1/centers
+curl https://<tu-dominio>/api/v1/centers/parroquia-san-antonio-tetuan
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Contribuir
+
+Lee [`CONTRIBUTING.md`](CONTRIBUTING.md). Resumen:
+
+- Todo cambio va por Pull Request a `main`.
+- Los PRs requieren aprobación de un mantenedor (definido en
+  [`.github/CODEOWNERS`](.github/CODEOWNERS)) y que pasen los checks
+  de CI (typecheck + lint + build).
+- Issues bienvenidas: bugs, propuestas, traducciones.
+
+## Aviso sobre los datos
+
+El código de este repositorio es open source bajo licencia MIT. Los
+datos de cada despliegue (centros reales, teléfonos, necesidades) son
+responsabilidad del operador de esa instancia y NO están cubiertos
+por esta licencia. Si despliegas tu propia instancia, verifica con
+cada centro antes de publicar su información.
+
+## Licencia
+
+[MIT](LICENSE) © 2026 Andrés Hernández y colaboradores.
