@@ -1,0 +1,41 @@
+import Link from 'next/link'
+import { HeartHandshake } from 'lucide-react'
+
+export function SiteHeader() {
+  return (
+    <header className="border-b bg-white">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <Link href="/" className="flex items-center gap-2">
+          <HeartHandshake className="h-6 w-6 text-red-600" />
+          <span className="text-lg font-semibold">
+            Centros de Acopio Madrid
+          </span>
+          <span className="hidden text-sm text-gray-500 sm:inline">
+            · Ayuda a Venezuela
+          </span>
+        </Link>
+
+        <nav className="flex items-center gap-4 text-sm">
+          <Link
+            href="/"
+            className="text-gray-700 hover:text-gray-900"
+          >
+            Centros
+          </Link>
+          <Link
+            href="/info"
+            className="text-gray-700 hover:text-gray-900"
+          >
+            Cómo ayudar
+          </Link>
+          <Link
+            href="/auth/login"
+            className="rounded-md border px-3 py-1.5 text-gray-700 hover:bg-gray-50"
+          >
+            Acceso centros
+          </Link>
+        </nav>
+      </div>
+    </header>
+  )
+}
