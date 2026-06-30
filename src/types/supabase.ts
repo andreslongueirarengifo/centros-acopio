@@ -128,6 +128,7 @@ export type Database = {
           description: string | null
           id: string
           location: unknown
+          manager_email: string | null
           manager_user_id: string | null
           name: string
           opening_hours: string | null
@@ -146,6 +147,7 @@ export type Database = {
           description?: string | null
           id?: string
           location: unknown
+          manager_email?: string | null
           manager_user_id?: string | null
           name: string
           opening_hours?: string | null
@@ -164,6 +166,7 @@ export type Database = {
           description?: string | null
           id?: string
           location?: unknown
+          manager_email?: string | null
           manager_user_id?: string | null
           name?: string
           opening_hours?: string | null
@@ -176,11 +179,97 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string
+          center_id: string
+          id: string
+          recipients_count: number
+          sent_at: string
+          sent_by: string | null
+          subject: string
+        }
+        Insert: {
+          body: string
+          center_id: string
+          id?: string
+          recipients_count?: number
+          sent_at?: string
+          sent_by?: string | null
+          subject: string
+        }
+        Update: {
+          body?: string
+          center_id?: string
+          id?: string
+          recipients_count?: number
+          sent_at?: string
+          sent_by?: string | null
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscriptions: {
+        Row: {
+          center_id: string
+          created_at: string
+          email: string
+          id: string
+          last_email_sent_at: string | null
+          unsubscribe_token: string
+          unsubscribed_at: string | null
+          verification_token: string
+          verified_at: string | null
+        }
+        Insert: {
+          center_id: string
+          created_at?: string
+          email: string
+          id?: string
+          last_email_sent_at?: string | null
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Update: {
+          center_id?: string
+          created_at?: string
+          email?: string
+          id?: string
+          last_email_sent_at?: string | null
+          unsubscribe_token?: string
+          unsubscribed_at?: string | null
+          verification_token?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_center_id_fkey"
+            columns: ["center_id"]
+            isOneToOne: false
+            referencedRelation: "centers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      center_subscriber_count: {
+        Args: { p_center_id: string }
+        Returns: number
+      }
       get_active_centers_with_coords: {
         Args: never
         Returns: {
