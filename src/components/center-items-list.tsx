@@ -1,5 +1,4 @@
-import { Badge } from '@/components/ui/badge'
-import { categoryLabels, categoryOrder, statusLabels } from '@/lib/labels'
+import { categoryLabels, categoryOrder } from '@/lib/labels'
 import { relativeTime } from '@/lib/utils/relative-time'
 import type { CenterItemWithCatalog } from '@/lib/queries/centers'
 import type { Database } from '@/types/supabase'
@@ -33,21 +32,18 @@ export function CenterItemsList({ items }: Props) {
   return (
     <div className="space-y-8">
       <StatusSection
-        status="needed"
         title="Necesita"
         description="Estos artículos hacen falta ahora. Si puedes traerlos, este es el centro."
         items={byStatus.needed}
         accent="red"
       />
       <StatusSection
-        status="surplus"
         title="Le sobra"
         description="Este centro tiene de más estos artículos — mejor llevarlos a otro."
         items={byStatus.surplus}
         accent="green"
       />
       <StatusSection
-        status="sufficient"
         title="Suficiente"
         description="Cubierto por ahora, no urge."
         items={byStatus.sufficient}
@@ -58,13 +54,11 @@ export function CenterItemsList({ items }: Props) {
 }
 
 function StatusSection({
-  status,
   title,
   description,
   items,
   accent,
 }: {
-  status: ItemStatus
   title: string
   description: string
   items: CenterItemWithCatalog[]

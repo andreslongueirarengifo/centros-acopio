@@ -1,9 +1,8 @@
 'use client'
 
 import { useState, useTransition, useOptimistic } from 'react'
-import { Check, X, Loader2 } from 'lucide-react'
+import { Check, Loader2 } from 'lucide-react'
 import { setItemStatus, removeItemStatus } from '@/lib/actions/center-items'
-import { statusLabels } from '@/lib/labels'
 import { relativeTime } from '@/lib/utils/relative-time'
 import type { ItemWithStatus } from '@/lib/queries/dashboard'
 import type { Database } from '@/types/supabase'
