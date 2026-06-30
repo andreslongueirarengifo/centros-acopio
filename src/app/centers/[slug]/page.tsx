@@ -14,6 +14,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { getCenterBySlug, getCenterItems } from '@/lib/queries/centers'
 import { CenterItemsList } from '@/components/center-items-list'
 import { relativeTime, isStale } from '@/lib/utils/relative-time'
+import { createClient } from '@/lib/supabase/server'
+import { SubscribeButton } from '@/components/subscriptions/subscribe-button'
+
 
 export const revalidate = 30
 
@@ -36,6 +39,8 @@ export async function generateMetadata({ params }: PageProps) {
 export default async function CenterDetailPage({ params }: PageProps) {
   const { slug } = await params
   const center = await getCenterBySlug(slug)
+  const supabase = await createClient()
+
 
   if (!center) {
     notFound()
@@ -59,6 +64,12 @@ export default async function CenterDetailPage({ params }: PageProps) {
           <h1 className="text-2xl font-bold md:text-3xl">
             {center.name}
           </h1>
+          
+          <div className="mb-4 flex items-center justify-between">
+            <div>{/* nombre, badges, etc */}</div>
+            <SubscribeButton centerId={center.id} centerName={center.name} />
+          </div>
+
           {center.verified && (
             <Badge
               variant="outline"

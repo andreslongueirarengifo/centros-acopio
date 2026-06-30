@@ -3,11 +3,11 @@ import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/supabase'
 
 /**
- * Refreshes the user's auth session on every request.
- * Without this, Server Components would see stale auth state.
+ * Refreshes the user's auth session on every request and protects
+ * /dashboard routes from unauthenticated access.
  *
  * IMPORTANT: do NOT add custom logic between `createServerClient`
- * and `supabase.auth.getUser()`. That ordering is required for
+ * and `supabase.auth.getUser()`. That ordering is required for the
  * cookie refresh to work correctly.
  */
 export async function updateSession(request: NextRequest) {
@@ -34,20 +34,27 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // This call refreshes the session and revalidates the cookie.
-  // Don't remove it.
-  const { data: { user } } = await supabase.auth.getUser()
+  // Refresh the session and revalidate the cookie. Don't move this.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Example: protect manager routes (uncomment when you have /dashboard)
-  //
-  // if (
-  //   !user &&
-  //   request.nextUrl.pathname.startsWith('/dashboard')
-  // ) {
-  //   const url = request.nextUrl.clone()
-  //   url.pathname = '/auth/login'
-  //   return NextResponse.redirect(url)
-  // }
+  const path = request.nextUrl.pathname
+
+  // Protect /dashboard and everything under it
+  if (!user && path.startsWith('/dashboard')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/login'
+    url.searchParams.set('next', path)
+    return NextResponse.redirect(url)
+  }
+
+  // If already logged in, sending them to /auth/login is pointless
+  if (user && path.startsWith('/auth/login')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
 
   return supabaseResponse
 }

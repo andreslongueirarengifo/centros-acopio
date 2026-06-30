@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { relativeTime, isStale } from '@/lib/utils/relative-time'
 import type { CenterListItem } from '@/lib/queries/centers'
+import { SubscribeButton } from '@/components/subscriptions/subscribe-button'
 
 export function CenterCard({ center }: { center: CenterListItem }) {
   const stale = isStale(center.updated_at, 48)
@@ -83,6 +84,14 @@ export function CenterCard({ center }: { center: CenterListItem }) {
               </span>
             )}
           </div>
+
+          <SubscribeButton
+            centerId={center.id}
+            centerName={center.name}
+            variant="ghost"
+            size="sm"
+          />
+          
         </CardContent>
       </Card>
     </Link>
