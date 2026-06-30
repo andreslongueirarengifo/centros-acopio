@@ -4,10 +4,10 @@ import type { Database } from '@/types/supabase'
 
 /**
  * Refreshes the user's auth session on every request and protects
- * /dashboard routes from unauthenticated access.
+ * /dashboard and /admin routes.
  *
- * IMPORTANT: do NOT add custom logic between `createServerClient`
- * and `supabase.auth.getUser()`. That ordering is required for the
+ * IMPORTANT: do NOT add logic between `createServerClient` and
+ * `supabase.auth.getUser()`. That ordering is required for the
  * cookie refresh to work correctly.
  */
 export async function updateSession(request: NextRequest) {
@@ -34,14 +34,13 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Refresh the session and revalidate the cookie. Don't move this.
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   const path = request.nextUrl.pathname
 
-  // Protect /dashboard and everything under it
+  // /dashboard: any logged-in user (manager check happens in the page)
   if (!user && path.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
@@ -49,7 +48,34 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // If already logged in, sending them to /auth/login is pointless
+  // /admin: must be logged in AND email in ADMIN_EMAILS
+  if (path.startsWith('/admin')) {
+    if (!user) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/auth/login'
+      url.searchParams.set('next', path)
+      return NextResponse.redirect(url)
+    }
+
+    // Admin check duplicated here as fast-fail. The Server Action
+    // double-checks too via requireAdmin() — that's the authoritative
+    // gate. This middleware check just avoids rendering the page shell.
+    const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+      .split(',')
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean)
+
+    if (
+      !user.email ||
+      !adminEmails.includes(user.email.toLowerCase())
+    ) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/admin/forbidden'
+      return NextResponse.rewrite(url)
+    }
+  }
+
+  // Don't show login form to already-authenticated users
   if (user && path.startsWith('/auth/login')) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
