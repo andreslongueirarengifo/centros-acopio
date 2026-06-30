@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect, useState } from 'react'
+import { useActionState, useState } from 'react'
 import { Loader2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -16,9 +16,6 @@ interface Props {
   center: AdminCenterDetail
 }
 
-// Shape of the controlled form state. All strings (HTML form values
-// are strings); nullables become empty strings for the UI and we
-// convert back to null in the Server Action.
 type FormState = {
   name: string
   description: string
@@ -56,17 +53,8 @@ export function EditCenterForm({ center }: Props) {
     updateCenter,
     undefined
   )
-  const [form, setForm] = useState<FormState>(() => buildInitialState(center))
 
-  // After a successful save, sync the form to whatever the server
-  // returned. This catches any normalization (lowercased emails, etc.)
-  // and resets the regeocode checkbox.
-  useEffect(() => {
-    if (state?.ok) {
-      setForm(buildInitialState(center))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state])
+  const [form, setForm] = useState<FormState>(() => buildInitialState(center))
 
   const set =
     <K extends keyof FormState>(field: K) =>
