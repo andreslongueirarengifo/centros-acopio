@@ -1,0 +1,25 @@
+# Code owners for automatic PR review assignment.
+# Anyone listed here is auto-requested as reviewer on PRs touching
+# the matching paths. Combined with branch protection ("require review
+# from Code Owners"), this means PRs cannot merge without approval
+# from the right people.
+#
+# Order matters: the last matching pattern takes precedence.
+
+# Default: owner reviews everything not matched below
+*                              @<tu-github-username>
+
+# Database schema and migrations: high-impact, owner only
+/supabase/                     @<tu-github-username>
+*.sql                          @<tu-github-username>
+
+# Supabase client setup, auth, RLS-sensitive code
+/src/lib/supabase/             @<tu-github-username>
+/src/middleware.ts             @<tu-github-username>
+
+# Public API: contract is stable, changes need owner review
+/src/app/api/                  @<tu-github-username>
+/docs/API.md                   @<tu-github-username>
+
+# CI/CD and repo config
+/.github/                      @<tu-github-username>
