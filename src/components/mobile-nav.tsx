@@ -3,22 +3,24 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Menu, X, LayoutDashboard } from 'lucide-react'
+import {
+  Menu,
+  X,
+  LayoutDashboard,
+  Building2,
+  LayoutGrid,
+  LogOut,
+} from 'lucide-react'
+import { signOut } from '@/lib/actions/auth'
 
 interface Props {
   loggedIn: boolean
+  isAdmin: boolean
+  userEmail: string | null
 }
 
-// Stable subscribe function for useSyncExternalStore. Defined at module
-// scope so its reference never changes across renders (a requirement).
 const subscribe = () => () => {}
 
-/**
- * Returns true only after client-side hydration has finished.
- * On the server (and during the initial client render that must match
- * SSR output), returns false. This lets us conditionally use APIs like
- * document.body that don't exist server-side.
- */
 function useIsClient() {
   return useSyncExternalStore(
     subscribe,
@@ -27,13 +29,13 @@ function useIsClient() {
   )
 }
 
-export function MobileNav({ loggedIn }: Props) {
+export function MobileNav({ loggedIn, isAdmin, userEmail }: Props) {
   const [open, setOpen] = useState(false)
   const isClient = useIsClient()
 
   const closeMenu = () => setOpen(false)
 
-  // Lock body scroll while menu is open
+  // Lock body scroll while the drawer is open
   useEffect(() => {
     if (open) {
       const original = document.body.style.overflow
@@ -54,8 +56,6 @@ export function MobileNav({ loggedIn }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  // The drawer is portaled into document.body so it isn't constrained
-  // by the sticky header's transform-based containing block.
   const drawer = (
     <div
       className="fixed inset-0 z-50 md:hidden"
@@ -98,7 +98,8 @@ export function MobileNav({ loggedIn }: Props) {
           </button>
         </div>
 
-        <nav className="flex flex-col gap-1 p-4 text-base">
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-4 text-base">
+          {/* Public section */}
           <MobileLink href="/" onClick={closeMenu}>
             Centros
           </MobileLink>
@@ -109,27 +110,77 @@ export function MobileNav({ loggedIn }: Props) {
             Privacidad
           </MobileLink>
 
-          <div className="my-2 h-px bg-stone-200" />
+          {/* Admin section: only when the user is an admin */}
+          {isAdmin && (
+            <>
+              <SectionLabel>Administración</SectionLabel>
+              <MobileLink
+                href="/admin"
+                onClick={closeMenu}
+                icon={<LayoutGrid className="h-4 w-4" />}
+                accent
+              >
+                Resumen
+              </MobileLink>
+              <MobileLink
+                href="/admin/centers"
+                onClick={closeMenu}
+                icon={<Building2 className="h-4 w-4" />}
+                accent
+              >
+                Gestionar centros
+              </MobileLink>
+            </>
+          )}
 
+          {/* Manager (logged in, not admin): dashboard link */}
+          {loggedIn && !isAdmin && (
+            <>
+              <div className="my-2 h-px bg-stone-200" />
+              <MobileLink
+                href="/dashboard"
+                onClick={closeMenu}
+                icon={<LayoutDashboard className="h-4 w-4" />}
+              >
+                Mi panel
+              </MobileLink>
+            </>
+          )}
+        </nav>
+
+        {/* Account section at the bottom */}
+        <div className="border-t border-stone-200 p-4">
           {loggedIn ? (
-            <Link
-              href="/dashboard"
-              onClick={closeMenu}
-              className="flex items-center gap-2 rounded-md bg-stone-100 px-3 py-3 font-medium text-stone-900"
-            >
-              <LayoutDashboard className="h-4 w-4" />
-              Mi panel
-            </Link>
+            <>
+              {userEmail && (
+                <p className="mb-3 truncate text-xs text-stone-500">
+                  Sesión iniciada como{' '}
+                  <span className="font-medium text-stone-700">
+                    {userEmail}
+                  </span>
+                </p>
+              )}
+              <form action={signOut}>
+                <button
+                  type="submit"
+                  onClick={closeMenu}
+                  className="flex w-full items-center justify-center gap-2 rounded-md border border-stone-300 px-3 py-2.5 text-sm font-medium text-stone-800 hover:bg-stone-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Cerrar sesión
+                </button>
+              </form>
+            </>
           ) : (
             <Link
               href="/auth/login"
               onClick={closeMenu}
-              className="rounded-md border border-stone-300 px-3 py-3 text-center font-medium text-stone-900"
+              className="flex w-full items-center justify-center rounded-md border border-stone-300 bg-white px-3 py-2.5 text-sm font-medium text-stone-800 hover:bg-stone-50"
             >
               Acceso centros
             </Link>
           )}
-        </nav>
+        </div>
       </div>
     </div>
   )
@@ -151,21 +202,38 @@ export function MobileNav({ loggedIn }: Props) {
   )
 }
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mt-4 mb-1 px-3 text-xs font-semibold uppercase tracking-wider text-stone-500">
+      {children}
+    </div>
+  )
+}
+
 function MobileLink({
   href,
   children,
   onClick,
+  icon,
+  accent,
 }: {
   href: string
   children: React.ReactNode
   onClick?: () => void
+  icon?: React.ReactNode
+  accent?: boolean
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className="rounded-md px-3 py-3 text-stone-800 hover:bg-stone-100"
+      className={`
+        flex items-center gap-2 rounded-md px-3 py-3
+        hover:bg-stone-100
+        ${accent ? 'text-red-700' : 'text-stone-800'}
+      `}
     >
+      {icon}
       {children}
     </Link>
   )
