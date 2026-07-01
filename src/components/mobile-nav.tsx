@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -14,17 +14,22 @@ export function MobileNav({ loggedIn }: Props) {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
+  const lastPathname = useRef(pathname)
+
+  // Close menu on route change. Comparing the previous pathname (kept in
+  // a ref) against the current one during render lets us update state
+  // without a useEffect, avoiding the react-hooks/set-state-in-effect
+  // lint rule and one extra render cycle.
+  if (lastPathname.current !== pathname) {
+    lastPathname.current = pathname
+    if (open) setOpen(false)
+  }
 
   // Portal target only exists after hydration. On SSR, document is
   // undefined, so we defer creating the portal until we've mounted.
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Close menu on route change
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
 
   // Lock body scroll while menu is open
   useEffect(() => {
