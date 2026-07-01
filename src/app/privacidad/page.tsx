@@ -27,10 +27,12 @@ export default function PrivacidadPage() {
         <section>
           <p>
             Esta política describe cómo tratamos los datos personales que
-            recogemos cuando usas Centros de Acopio Madrid, una plataforma
-            sin ánimo de lucro para coordinar la ayuda humanitaria a las
+            recogemos cuando usas Centros de Acopio, una plataforma sin
+            ánimo de lucro para coordinar la ayuda humanitaria a las
             personas afectadas por los terremotos del 24 de junio de 2026
-            en Venezuela.
+            en Venezuela. La plataforma opera actualmente en España e
+            Italia, con vocación de crecer a otros países europeos donde
+            se estén organizando iniciativas similares.
           </p>
           <p>
             Nos tomamos la privacidad en serio y hemos diseñado el

@@ -20,7 +20,7 @@ export async function SiteHeader() {
         <Link href="/" className="flex items-center gap-2">
           <HeartHandshake className="h-6 w-6 shrink-0 text-red-600" />
           <span className="text-base font-semibold sm:text-lg">
-            Centros de Acopio Madrid
+            Centros de Acopio
           </span>
         </Link>
 
