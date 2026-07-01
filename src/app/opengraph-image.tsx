@@ -6,54 +6,22 @@ export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
 /**
- * Load a Google Font as an ArrayBuffer for use inside ImageResponse.
- *
- * Satori (the engine behind ImageResponse) cannot parse WOFF2.
- * Google Fonts serves WOFF2 by default when the User-Agent is a
- * modern browser. We spoof an IE11 User-Agent to force Google
- * to serve the TTF version, which satori accepts.
+ * OG image sin carga externa de fuentes. Usa la fuente por defecto
+ * de next/og (Noto Sans en Vercel). Si en el futuro quieres Manrope
+ * exacto, hay que bundle el TTF localmente — ver instrucciones en el
+ * comentario de abajo.
  */
-async function loadGoogleFont(font: string, text: string) {
-  const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`
-  const css = await (
-    await fetch(url, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
-      },
-    })
-  ).text()
-
-  const resource = css.match(
-    /src: url\((.+?)\) format\('(opentype|truetype)'\)/
-  )
-  if (resource) {
-    const response = await fetch(resource[1])
-    if (response.status === 200) return await response.arrayBuffer()
-  }
-  throw new Error('Failed to load font from Google Fonts')
-}
-
 export default async function OpenGraphImage() {
-  const text =
-    'Ubica tu Centro de Acopio Ayuda desde Europa a Venezuela ubicatucentrodeacopio.com'
-
-  const [manropeBold, manropeMedium] = await Promise.all([
-    loadGoogleFont('Manrope:wght@800', text),
-    loadGoogleFont('Manrope:wght@500', text),
-  ])
-
   return new ImageResponse(
     (
       <div
         style={{
-          background: '#fafaf9',
+          background: '#fafaf9', // stone-50
           width: '100%',
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
           padding: 80,
-          fontFamily: 'Manrope',
         }}
       >
         <svg
@@ -77,7 +45,7 @@ export default async function OpenGraphImage() {
             marginTop: 48,
             fontSize: 92,
             fontWeight: 800,
-            color: '#1c1917',
+            color: '#1c1917', // stone-900
             lineHeight: 1.0,
             letterSpacing: '-0.02em',
           }}
@@ -92,7 +60,7 @@ export default async function OpenGraphImage() {
             marginTop: 24,
             fontSize: 42,
             fontWeight: 500,
-            color: '#57534e',
+            color: '#57534e', // stone-600
             lineHeight: 1.3,
           }}
         >
@@ -104,29 +72,13 @@ export default async function OpenGraphImage() {
             marginTop: 'auto',
             fontSize: 24,
             fontWeight: 500,
-            color: '#a8a29e',
+            color: '#a8a29e', // stone-400
           }}
         >
           ubicatucentrodeacopio.com
         </div>
       </div>
     ),
-    {
-      ...size,
-      fonts: [
-        {
-          name: 'Manrope',
-          data: manropeBold,
-          style: 'normal',
-          weight: 800,
-        },
-        {
-          name: 'Manrope',
-          data: manropeMedium,
-          style: 'normal',
-          weight: 500,
-        },
-      ],
-    }
+    { ...size }
   )
 }
