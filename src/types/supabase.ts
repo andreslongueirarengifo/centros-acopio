@@ -288,6 +288,29 @@ export type Database = {
           verified: boolean
         }[]
       }
+      get_center_by_slug: {
+        Args: { slug_input: string }
+        Returns: {
+          active: boolean
+          address: string
+          city: string
+          created_at: string
+          description: string
+          id: string
+          lat: number
+          lng: number
+          manager_email: string
+          manager_user_id: string
+          name: string
+          opening_hours: string
+          postal_code: string
+          public_email: string
+          public_phone: string
+          slug: string
+          updated_at: string
+          verified: boolean
+        }[]
+      }
       nearby_centers: {
         Args: { lat: number; lng: number; radius_meters?: number }
         Returns: {

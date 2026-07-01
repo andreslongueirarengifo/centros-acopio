@@ -62,24 +62,51 @@ export async function getActiveCenters(): Promise<CenterListItem[]> {
   }))
 }
 
+export type CenterDetail = {
+  id: string
+  slug: string
+  name: string
+  description: string | null
+  address: string
+  postal_code: string | null
+  city: string
+  public_phone: string | null
+  public_email: string | null
+  opening_hours: string | null
+  manager_user_id: string | null
+  manager_email: string | null
+  verified: boolean
+  active: boolean
+  created_at: string
+  updated_at: string
+  lat: number
+  lng: number
+}
+
 /**
  * Single center by slug (only if active).
+ * Uses the RPC to get lat/lng flattened alongside the rest of the row.
  */
-export async function getCenterBySlug(slug: string) {
+export async function getCenterBySlug(
+  slug: string
+): Promise<CenterDetail | null> {
   const supabase = await createClient()
-  const { data, error } = await supabase
-    .from('centers')
-    .select('*')
-    .eq('slug', slug)
-    .eq('active', true)
-    .maybeSingle()
+
+  const { data, error } = await supabase.rpc('get_center_by_slug', {
+    slug_input: slug,
+  })
 
   if (error) throw error
-  return data
+  if (!data || data.length === 0) return null
+
+  return data[0]
 }
 
 export type CenterItemWithCatalog = CenterItem & {
-  catalog_items: Pick<CatalogItem, 'id' | 'name' | 'category' | 'sort_order'> | null
+  catalog_items: Pick<
+    CatalogItem,
+    'id' | 'name' | 'category' | 'sort_order'
+  > | null
 }
 
 /**

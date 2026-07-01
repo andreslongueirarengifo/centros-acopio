@@ -13,7 +13,7 @@ import {
 export const metadata: Metadata = {
   title: 'Cómo ayudar',
   description:
-    'Guía práctica para donar a los afectados por los terremotos de Venezuela: cómo funcionan los centros de acopio en Madrid y qué organizaciones canalizan ayuda económica desde España.',
+    'Guía práctica para donar a los afectados por los terremotos de Venezuela desde España e Italia: cómo funcionan los centros de acopio cerca de ti y qué organizaciones canalizan ayuda económica.',
 }
 
 export default function InfoPage() {
@@ -28,46 +28,58 @@ export default function InfoPage() {
       <p className="mt-4 text-lg leading-relaxed text-stone-700">
         Los terremotos del 24 de junio de 2026 en Venezuela han dejado
         más de mil fallecidos y miles de familias sin hogar. Desde
-        Madrid puedes ayudar de dos formas: llevando material a un
-        centro de acopio o donando económicamente a una organización.
-        Ambas cuentan.
+        Europa puedes ayudar de dos formas: llevando material a un
+        centro de acopio cerca de ti, o donando económicamente a una
+        organización. Ambas cuentan.
       </p>
 
       {/* ================================================================ */}
-      {/* Cómo funciona la plataforma */}
+      {/* Qué es la plataforma */}
       {/* ================================================================ */}
       <section className="mt-14">
         <h2 className="text-xl font-semibold text-stone-900">
           Qué es esta plataforma
         </h2>
         <p className="mt-3 leading-relaxed text-stone-800">
-          Centros de Acopio Madrid nació con un objetivo concreto:
-          centralizar información sobre los puntos físicos de recogida
-          en la comunidad de Madrid y mantener a los donantes al día de
-          qué necesita realmente cada centro. Sin este tipo de
-          coordinación, los centros terminan llenos de cosas que no
-          necesitan y les faltan las que sí. Eso es lo que intentamos
-          evitar.
+          Centros de Acopio nació con un objetivo concreto: centralizar
+          la información sobre los puntos físicos de recogida donde se
+          está organizando la ayuda para las víctimas del terremoto, y
+          mantener a los donantes al día de qué necesita realmente cada
+          centro. Sin este tipo de coordinación, los centros terminan
+          llenos de cosas que no necesitan y les faltan las que sí. Eso
+          es lo que intentamos evitar.
         </p>
         <p className="mt-3 leading-relaxed text-stone-800">
-          Nosotros no recogemos donaciones ni gestionamos logística. Cada
-          centro es autónomo y lo lleva una organización, parroquia,
-          asociación o local comercial. Nuestra función es que sea fácil
-          para ti saber a dónde ir y con qué.
+          Nosotros no recogemos donaciones ni gestionamos logística.
+          Cada centro es autónomo y lo lleva una organización,
+          parroquia, asociación o local comercial. Nuestra función es
+          que sea fácil para ti saber a dónde ir y con qué.
+        </p>
+        <p className="mt-3 leading-relaxed text-stone-800">
+          <strong>Empezamos por España e Italia.</strong> Si en tu
+          ciudad hay una iniciativa que quiere sumarse, escríbenos a{' '}
+          <a
+            href="mailto:ubicatucentrodeacopio@gmail.com"
+            className="font-medium text-red-700 underline underline-offset-2 hover:text-red-800"
+          >
+            ubicatucentrodeacopio@gmail.com
+          </a>
+          . La plataforma es abierta y añadir nuevos países es cuestión
+          de que alguien local coordine con nosotros.
         </p>
       </section>
 
       {/* ================================================================ */}
-      {/* Pasos para donar material */}
+      {/* Donar material */}
       {/* ================================================================ */}
       <section className="mt-14">
         <h2 className="text-xl font-semibold text-stone-900">
           Donar material físico
         </h2>
         <p className="mt-3 leading-relaxed text-stone-800">
-          Si prefieres traer productos concretos, sigue estos tres pasos.
-          Comprobar antes qué se necesita ahorra viajes en falso y
-          asegura que la ayuda llega donde hace falta.
+          Si prefieres traer productos concretos, sigue estos tres
+          pasos. Comprobar antes qué se necesita ahorra viajes en falso
+          y asegura que la ayuda llega donde hace falta.
         </p>
 
         <ol className="mt-6 space-y-6">
@@ -83,8 +95,8 @@ export default function InfoPage() {
             >
               página principal
             </Link>{' '}
-            tienes el mapa con todos los centros activos en Madrid.
-            Elige el que te venga mejor por cercanía u horario.
+            tienes el mapa con todos los centros activos. Elige el que
+            te venga mejor por cercanía u horario.
           </Step>
           <Step
             n={2}
@@ -127,9 +139,10 @@ export default function InfoPage() {
         </p>
         <p className="mt-3 leading-relaxed text-stone-800">
           Estas son organizaciones consolidadas que están canalizando
-          ayuda a los afectados por el terremoto. Todas emiten
+          ayuda a los afectados por el terremoto. La mayoría emite
           certificado de donación con desgravación fiscal para
-          personas físicas y jurídicas en España.
+          personas físicas y jurídicas en España; en Italia consulta
+          las ventajas fiscales en la web de cada organización.
         </p>
 
         <div className="mt-8 space-y-4">
@@ -146,7 +159,7 @@ export default function InfoPage() {
           />
           <Org
             name="Save the Children"
-            summary="Enfocada en menores y familias afectadas. Ha activado equipos en las zonas de La Guaira y Caracas."
+            summary="Enfocada en menores y familias afectadas. Ha activado equipos en las zonas de La Guaira y Caracas. Presencia también en Italia (Save the Children Italia)."
             actions={[
               {
                 label: 'Bizum al 13132 (concepto: Terremoto Venezuela)',
@@ -162,14 +175,19 @@ export default function InfoPage() {
                 href: 'https://www.savethechildren.es/donacion-ong/terremoto-en-venezuela-2026',
                 icon: 'link',
               },
+              {
+                label: 'savethechildren.it',
+                href: 'https://www.savethechildren.it',
+                icon: 'link',
+              },
             ]}
           />
           <Org
-            name="Cáritas Española"
-            summary="Trabaja con Cáritas Venezuela y las Cáritas diocesanas de los estados afectados. Ha movilizado 300.000€ iniciales para la respuesta."
+            name="Cáritas"
+            summary="Trabaja con Cáritas Venezuela y las Cáritas diocesanas de los estados afectados. Presente en España (Cáritas Española) e Italia (Caritas Italiana)."
             actions={[
               {
-                label: 'Bizum al 0089',
+                label: 'Bizum al 0089 (España)',
                 icon: 'bizum',
               },
               {
@@ -177,15 +195,25 @@ export default function InfoPage() {
                 href: 'https://www.caritas.es',
                 icon: 'link',
               },
+              {
+                label: 'caritas.it',
+                href: 'https://www.caritas.it',
+                icon: 'link',
+              },
             ]}
           />
           <Org
-            name="Cruz Roja Española"
+            name="Cruz Roja / Croce Rossa"
             summary="Coordina con la Federación Internacional (IFRC) y con la Cruz Roja Venezolana los equipos de emergencia sobre el terreno."
             actions={[
               {
                 label: 'cruzroja.es',
                 href: 'https://www.cruzroja.es',
+                icon: 'link',
+              },
+              {
+                label: 'cri.it',
+                href: 'https://www.cri.it',
                 icon: 'link',
               },
             ]}
@@ -197,6 +225,11 @@ export default function InfoPage() {
               {
                 label: 'unicef.es',
                 href: 'https://www.unicef.es',
+                icon: 'link',
+              },
+              {
+                label: 'unicef.it',
+                href: 'https://www.unicef.it',
                 icon: 'link',
               },
             ]}
@@ -225,7 +258,7 @@ export default function InfoPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* Otras formas de ayudar */}
+      {/* Otras formas */}
       {/* ================================================================ */}
       <section className="mt-14">
         <h2 className="text-xl font-semibold text-stone-900">
@@ -265,7 +298,7 @@ export default function InfoPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* Cierre */}
+      {/* CTA final */}
       {/* ================================================================ */}
       <div className="mt-14 rounded-md border border-stone-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-stone-900">
@@ -273,8 +306,10 @@ export default function InfoPage() {
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-stone-700">
           Si tu asociación, parroquia o comercio está recibiendo
-          donaciones y quieres aparecer en la plataforma para que la
-          gente sepa exactamente qué necesitas, escríbenos a{' '}
+          donaciones — en cualquier ciudad de España, Italia o de
+          otro país europeo que quiera sumarse — y quieres aparecer en
+          la plataforma para que la gente sepa exactamente qué
+          necesitas, escríbenos a{' '}
           <a
             href="mailto:ubicatucentrodeacopio@gmail.com"
             className="font-medium text-red-700 underline underline-offset-2 hover:text-red-800"
