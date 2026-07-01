@@ -19,23 +19,23 @@ export function NewCenterForm() {
 
   return (
     <form action={action} className="space-y-5">
-      <FieldGroup title="Datos pUblicos">
+      <FieldGroup title="Datos públicos">
         <Field label="Nombre" name="name" required maxLength={120} />
         <Field
-          label="DescripciOn"
+          label="Descripción"
           name="description"
           textarea
           rows={2}
           maxLength={500}
         />
-        <Field label="DirecciOn" name="address" required maxLength={200} />
+        <Field label="Dirección" name="address" required maxLength={200} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="COdigo postal" name="postal_code" maxLength={10} />
+          <Field label="Código postal" name="postal_code" maxLength={10} />
           <Field label="Ciudad" name="city" defaultValue="Madrid" required />
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label="TelEfono pUblico" name="public_phone" />
-          <Field label="Email pUblico" name="public_email" type="email" />
+          <Field label="Teléfono público" name="public_phone" />
+          <Field label="Email público" name="public_email" type="email" />
         </div>
         <Field
           label="Horario"
@@ -44,7 +44,7 @@ export function NewCenterForm() {
         />
       </FieldGroup>
 
-      <FieldGroup title="GestiOn">
+      <FieldGroup title="Gestión">
         <Field
           label="Email del manager"
           name="manager_email"
@@ -61,7 +61,7 @@ export function NewCenterForm() {
 
       <FieldGroup
         title="Coordenadas (opcional)"
-        description="Si los dejas vacIos, las coordenadas se calcularan automAticamente a partir de la direcciOn."
+        description="Si los dejas vacIos, las coordenadas se calcularan automAticamente a partir de la dirección."
       >
         <div className="grid gap-3 sm:grid-cols-2">
           <Field
