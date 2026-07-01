@@ -1,34 +1,31 @@
 import { ImageResponse } from 'next/og'
 
-// Standard OG image dimensions accepted by Twitter, LinkedIn, WhatsApp, etc.
 export const alt =
   'Ubica tu Centro de Acopio — Ayuda desde Europa a Venezuela'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
 /**
- * Load a Google Font as ArrayBuffer for use inside ImageResponse.
- * ImageResponse is powered by satori under the hood, which needs
- * the raw font bytes to render text.
+ * Load a Google Font as an ArrayBuffer for use inside ImageResponse.
  *
- * We ask Google only for the glyphs we actually need (via `text`
- * param) to keep the download small.
+ * Satori (the engine behind ImageResponse) cannot parse WOFF2.
+ * Google Fonts serves WOFF2 by default when the User-Agent is a
+ * modern browser. We spoof an IE11 User-Agent to force Google
+ * to serve the TTF version, which satori accepts.
  */
 async function loadGoogleFont(font: string, text: string) {
   const url = `https://fonts.googleapis.com/css2?family=${font}&text=${encodeURIComponent(text)}`
   const css = await (
     await fetch(url, {
-      // Google returns different formats depending on User-Agent.
-      // Modern UA gets woff2 which satori supports.
       headers: {
         'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36',
+          'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
       },
     })
   ).text()
 
   const resource = css.match(
-    /src: url\((.+?)\) format\('(woff2?|opentype|truetype)'\)/
+    /src: url\((.+?)\) format\('(opentype|truetype)'\)/
   )
   if (resource) {
     const response = await fetch(resource[1])
@@ -38,8 +35,6 @@ async function loadGoogleFont(font: string, text: string) {
 }
 
 export default async function OpenGraphImage() {
-  // Every character that appears in the image, so Google returns
-  // only the glyphs we need
   const text =
     'Ubica tu Centro de Acopio Ayuda desde Europa a Venezuela ubicatucentrodeacopio.com'
 
@@ -52,7 +47,7 @@ export default async function OpenGraphImage() {
     (
       <div
         style={{
-          background: '#fafaf9', // stone-50
+          background: '#fafaf9',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -61,7 +56,6 @@ export default async function OpenGraphImage() {
           fontFamily: 'Manrope',
         }}
       >
-        {/* HeartHandshake icon */}
         <svg
           width="120"
           height="120"
@@ -78,13 +72,12 @@ export default async function OpenGraphImage() {
           <path d="m15 18-2-2" />
         </svg>
 
-        {/* Title */}
         <div
           style={{
             marginTop: 48,
             fontSize: 92,
             fontWeight: 800,
-            color: '#1c1917', // stone-900
+            color: '#1c1917',
             lineHeight: 1.0,
             letterSpacing: '-0.02em',
           }}
@@ -94,26 +87,24 @@ export default async function OpenGraphImage() {
           de Acopio
         </div>
 
-        {/* Subtitle */}
         <div
           style={{
             marginTop: 24,
             fontSize: 42,
             fontWeight: 500,
-            color: '#57534e', // stone-600
+            color: '#57534e',
             lineHeight: 1.3,
           }}
         >
           Ayuda desde Europa a Venezuela
         </div>
 
-        {/* Domain pinned to the bottom */}
         <div
           style={{
             marginTop: 'auto',
             fontSize: 24,
             fontWeight: 500,
-            color: '#a8a29e', // stone-400
+            color: '#a8a29e',
           }}
         >
           ubicatucentrodeacopio.com
