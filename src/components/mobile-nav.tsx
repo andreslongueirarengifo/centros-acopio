@@ -1,35 +1,37 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { Menu, X, LayoutDashboard } from 'lucide-react'
 
 interface Props {
   loggedIn: boolean
 }
 
+// Stable subscribe function for useSyncExternalStore. Defined at module
+// scope so its reference never changes across renders (a requirement).
+const subscribe = () => () => {}
+
+/**
+ * Returns true only after client-side hydration has finished.
+ * On the server (and during the initial client render that must match
+ * SSR output), returns false. This lets us conditionally use APIs like
+ * document.body that don't exist server-side.
+ */
+function useIsClient() {
+  return useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  )
+}
+
 export function MobileNav({ loggedIn }: Props) {
   const [open, setOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const pathname = usePathname()
-  const lastPathname = useRef(pathname)
+  const isClient = useIsClient()
 
-  // Close menu on route change. Comparing the previous pathname (kept in
-  // a ref) against the current one during render lets us update state
-  // without a useEffect, avoiding the react-hooks/set-state-in-effect
-  // lint rule and one extra render cycle.
-  if (lastPathname.current !== pathname) {
-    lastPathname.current = pathname
-    if (open) setOpen(false)
-  }
-
-  // Portal target only exists after hydration. On SSR, document is
-  // undefined, so we defer creating the portal until we've mounted.
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const closeMenu = () => setOpen(false)
 
   // Lock body scroll while menu is open
   useEffect(() => {
@@ -52,9 +54,8 @@ export function MobileNav({ loggedIn }: Props) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  // The drawer is rendered via a Portal into document.body so it isn't
-  // constrained by the sticky header's transform-based containing block.
-  // Otherwise `fixed inset-0` would only fill the header, not the viewport.
+  // The drawer is portaled into document.body so it isn't constrained
+  // by the sticky header's transform-based containing block.
   const drawer = (
     <div
       className="fixed inset-0 z-50 md:hidden"
@@ -64,9 +65,9 @@ export function MobileNav({ loggedIn }: Props) {
       aria-hidden={!open}
       inert={!open}
     >
-      {/* Backdrop: fades in/out */}
+      {/* Backdrop */}
       <div
-        onClick={() => setOpen(false)}
+        onClick={closeMenu}
         className={`
           absolute inset-0 bg-stone-900/50 backdrop-blur-sm
           transition-opacity duration-300 ease-out
@@ -75,7 +76,7 @@ export function MobileNav({ loggedIn }: Props) {
         `}
       />
 
-      {/* Panel: slides in from the right */}
+      {/* Panel */}
       <div
         className={`
           absolute inset-y-0 right-0 flex w-full max-w-xs flex-col
@@ -89,7 +90,7 @@ export function MobileNav({ loggedIn }: Props) {
           <span className="text-sm font-semibold text-stone-700">Menú</span>
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={closeMenu}
             className="rounded-md p-2 text-stone-700 hover:bg-stone-100"
             aria-label="Cerrar menú"
           >
@@ -98,15 +99,22 @@ export function MobileNav({ loggedIn }: Props) {
         </div>
 
         <nav className="flex flex-col gap-1 p-4 text-base">
-          <MobileLink href="/">Centros</MobileLink>
-          <MobileLink href="/info">Cómo ayudar</MobileLink>
-          <MobileLink href="/privacidad">Privacidad</MobileLink>
+          <MobileLink href="/" onClick={closeMenu}>
+            Centros
+          </MobileLink>
+          <MobileLink href="/info" onClick={closeMenu}>
+            Cómo ayudar
+          </MobileLink>
+          <MobileLink href="/privacidad" onClick={closeMenu}>
+            Privacidad
+          </MobileLink>
 
           <div className="my-2 h-px bg-stone-200" />
 
           {loggedIn ? (
             <Link
               href="/dashboard"
+              onClick={closeMenu}
               className="flex items-center gap-2 rounded-md bg-stone-100 px-3 py-3 font-medium text-stone-900"
             >
               <LayoutDashboard className="h-4 w-4" />
@@ -115,6 +123,7 @@ export function MobileNav({ loggedIn }: Props) {
           ) : (
             <Link
               href="/auth/login"
+              onClick={closeMenu}
               className="rounded-md border border-stone-300 px-3 py-3 text-center font-medium text-stone-900"
             >
               Acceso centros
@@ -137,7 +146,7 @@ export function MobileNav({ loggedIn }: Props) {
         <Menu className="h-5 w-5" />
       </button>
 
-      {mounted && createPortal(drawer, document.body)}
+      {isClient && createPortal(drawer, document.body)}
     </>
   )
 }
@@ -145,13 +154,16 @@ export function MobileNav({ loggedIn }: Props) {
 function MobileLink({
   href,
   children,
+  onClick,
 }: {
   href: string
   children: React.ReactNode
+  onClick?: () => void
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className="rounded-md px-3 py-3 text-stone-800 hover:bg-stone-100"
     >
       {children}
