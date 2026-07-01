@@ -3,22 +3,20 @@
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { isAdminEmail } from '@/lib/auth/admin'
+
+// =====================================================================
+// MAGIC LINK (managers de centro)
+// =====================================================================
 
 const requestLinkSchema = z.object({
-  email: z.string().email('Email no válido').toLowerCase(),
+  email: z.string().email('Email no valido').toLowerCase(),
 })
 
-export type RequestLinkState = {
-  error?: string
-} | undefined
+export type RequestLinkState =
+  | { error?: string }
+  | undefined
 
-/**
- * Server Action: sends a magic link to the given email.
- *
- * We never reveal whether the email is registered or not — both
- * paths lead to /auth/check-email. This prevents email enumeration
- * (an attacker can't probe which emails are valid managers).
- */
 export async function requestMagicLink(
   _prevState: RequestLinkState,
   formData: FormData
@@ -28,34 +26,82 @@ export async function requestMagicLink(
   })
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Email no válido' }
+    return { error: parsed.error.issues[0]?.message ?? 'Email no valido' }
   }
 
   const supabase = await createClient()
 
-  // We intentionally don't check if the email belongs to a registered
-  // manager before sending. Supabase's signInWithOtp with
-  // `shouldCreateUser: true` only sends the email to allowed addresses
-  // when the schema-side check (manager_email allowlist) is in place,
-  // because the auth trigger only links existing centers.
-  //
-  // Note: signInWithOtp will create an auth.users row regardless.
-  // If you want to enforce strict allowlist BEFORE creating the user,
-  // add a pre-check here that queries `centers` for manager_email.
   await supabase.auth.signInWithOtp({
     email: parsed.data.email,
     options: {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/auth/callback`,
-      shouldCreateUser: true,
+      shouldCreateUser: false,
     },
   })
 
   redirect('/auth/check-email')
 }
 
+
+// =====================================================================
+// PASSWORD (admins)
+// =====================================================================
+
+const passwordLoginSchema = z.object({
+  email: z.string().email('Email no valido').toLowerCase(),
+  password: z.string().min(1, 'Introduce tu contrasena'),
+})
+
+export type PasswordLoginState =
+  | { error?: string }
+  | undefined
+
 /**
- * Server Action: sign out and clear cookies.
+ * Password login for admins only.
+ *
+ * We check ADMIN_EMAILS BEFORE attempting to sign in, to avoid
+ * revealing to the client whether a non-admin email exists in the
+ * system. Non-admins get the same generic error whether their email
+ * exists or not.
  */
+export async function loginWithPassword(
+  _prev: PasswordLoginState,
+  formData: FormData
+): Promise<PasswordLoginState> {
+  const parsed = passwordLoginSchema.safeParse({
+    email: formData.get('email'),
+    password: formData.get('password'),
+  })
+
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Datos invalidos' }
+  }
+
+  // Reject non-admin emails at the door
+  if (!isAdminEmail(parsed.data.email)) {
+    return { error: 'Credenciales incorrectas' }
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  })
+
+  if (error) {
+    // Same generic message whether email exists, password is wrong,
+    // or anything else. Don't leak which case it is.
+    return { error: 'Credenciales incorrectas' }
+  }
+
+  redirect('/admin')
+}
+
+
+// =====================================================================
+// SIGN OUT
+// =====================================================================
+
 export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
