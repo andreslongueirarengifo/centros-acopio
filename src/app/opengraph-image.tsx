@@ -7,9 +7,13 @@ export const contentType = 'image/png'
 
 /**
  * OG image sin carga externa de fuentes. Usa la fuente por defecto
- * de next/og (Noto Sans en Vercel). Si en el futuro quieres Manrope
- * exacto, hay que bundle el TTF localmente — ver instrucciones en el
- * comentario de abajo.
+ * de next/og. Si en el futuro quieres Manrope exacto, bundle el TTF
+ * localmente y pasalo en `fonts`.
+ *
+ * Nota importante: satori (el motor detras de ImageResponse) es
+ * estricto y exige que todo <div> con mas de un hijo declare
+ * `display: flex` (o `contents`/`none`) explicitamente. No acepta
+ * el `display: block` implicito del navegador.
  */
 export default async function OpenGraphImage() {
   return new ImageResponse(
@@ -40,9 +44,12 @@ export default async function OpenGraphImage() {
           <path d="m15 18-2-2" />
         </svg>
 
+        {/* Titulo: dos lineas en dos divs para no depender de <br /> */}
         <div
           style={{
             marginTop: 48,
+            display: 'flex',
+            flexDirection: 'column',
             fontSize: 92,
             fontWeight: 800,
             color: '#1c1917', // stone-900
@@ -50,9 +57,8 @@ export default async function OpenGraphImage() {
             letterSpacing: '-0.02em',
           }}
         >
-          Ubica tu Centro
-          <br />
-          de Acopio
+          <div>Ubica tu Centro</div>
+          <div>de Acopio</div>
         </div>
 
         <div
